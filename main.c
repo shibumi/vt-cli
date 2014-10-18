@@ -1,8 +1,8 @@
 /* vt-cli - A simple VirusTotal-Client written in C
- * 
+ *
  * Copyright (c) 2014 by Christian Rebischke <echo Q2hyaXMuUmViaXNjaGtlQGdtYWlsLmNvbQo= | base64 -d>
  *
- * Copyright (c) 2014 by Klassiker <your email>
+ * Copyright (c) 2014 by Klassiker <echo a2xhc3Npa2Vya2xhc3Npa2VyQGxpdmUuZGUK | base64 -d>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
  *
  *====================================================================== 
  * Author: Klassiker
- * Email :
+ * Email : echo a2xhc3Npa2Vya2xhc3Npa2VyQGxpdmUuZGUK | base64 -d
  * Github: www.github.com/Klassiker
  *
  * Author: Christian Rebischke
