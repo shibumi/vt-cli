@@ -60,8 +60,27 @@ void print_usage(const char *program_name){
 }
 
 int main(int argc, char * const *argv){
+  char* api_key = NULL;
+  char buffer[64];
+
+  // Get apikey from ~/.vt-cli
+  FILE *f = fopen(strcat(getenv("HOME"),"/.vt-cli"), "w+");
+  if(f == NULL){
+    printf("Error opening file.\n");
+    exit(1);
+  }
+  api_key = fgets(buffer, sizeof(buffer), f);
+  if(api_key == NULL){
+    printf("First start, enter apikey here:\n");
+    scanf("%s", api_key);
+  }
+  printf("%s", api_key);
+  fclose(f);
+
+  // Print Usage if no parameter is given
   if(argc < 2){
     print_usage(argv[0]);
     return 0;
   }
+
 }
