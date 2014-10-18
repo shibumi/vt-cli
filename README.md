@@ -3,9 +3,11 @@ vt-cli
 
 A small VirusTotal-Client written in C
 
-Based on the libs from:
-https://github.com/VirusTotal/c-vtapi/
+**Dependencies**
 
-Completely re-written client by
-- https://github.com/shibumi/
-- https://github.com/klassiker/
+* [c-vtapi](https://github.com/VirusTotal/c-vtapi/)
+
+**Current Contributors**
+
+* [shibumi](https://github.com/shibumi/)
+* [klassiker](https://github.com/klassiker/)
