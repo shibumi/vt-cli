@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/
  *
- *====================================================================== 
+ *======================================================================
  * Author: Klassiker
  * Email : echo a2xhc3Npa2Vya2xhc3Npa2VyQGxpdmUuZGUK | base64 -d
  * Github: www.github.com/Klassiker
@@ -42,20 +42,20 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <jansson.h>
-#include <VtFile.h>
-#include <VtResponse.h>
+#include "VtFile.h"
+#include "VtResponse.h"
 
 static bool no_error = true;
 
 void print_usage(const char *program_name){
-  printf("%s", program_name);
-  printf("    scandomain <DOMAIN>        get a report on DOMAIN\n");
-  printf("    scanip <IP>        get a report on IP\n");
-  printf("    scanfile <FILE>        FILE to scan, auto gets the report and parses it\n");
-  printf("    scanurl <URL> <allinfo>        url to scan, allinfo is boolean\n");
-  printf("    commentsget <HASH> <before>        before is a timestamp with YYYYMMDDHHSS, optional\n");
-  printf("    commentsput <HASH> 'comments'        add comment to resource by hash\n");
-  printf("    search <STRING> <offset>        search for a report\n");
+  printf("%s\n", program_name);
+  printf("    scandomain <DOMAIN>			get a report on DOMAIN\n");
+  printf("    scanip <IP>				get a report on IP\n");
+  printf("    scanfile <FILE>			FILE to scan, auto gets the report and parses it\n");
+  printf("    scanurl <URL> <allinfo>		url to scan, allinfo is boolean\n");
+  printf("    commentsget <HASH> <before>		before is a timestamp with YYYYMMDDHHSS, optional\n");
+  printf("    commentsput <HASH> 'comments'	add comment to resource by hash\n");
+  printf("    search <STRING> <offset>		search for a report\n");
 }
 
 void sighand_callback(int sig){
@@ -73,10 +73,9 @@ int filecheck(const char *fname){
 }
 
 int main(int argc, char * const *argv){
-  //the apikey need a way to prevent buffer overflows?
-  char apikey[64];
-  //location of config file TODO Check if HOME exists
-  const char *fname = strcat(getenv("HOME"),"/.vtconfig");
+  char apikey[65]; //the apikey need a way to prevent buffer overflows?
+  const char *fname = strcat(getenv("HOME"),"/.vtconfig"); //location of config file TODO Check if HOME exists
+
   //signals for c-vtapi dunno why
   signal(SIGHUP, sighand_callback);
   signal(SIGTERM, sighand_callback);
@@ -86,23 +85,23 @@ int main(int argc, char * const *argv){
     print_usage(argv[0]);
     return 0;
   }
-  
-  // Check if vt-config exists
+
+  // Check if vtconfig exists
   if(filecheck(fname)){
     printf("No vtconfig found!\n");
     printf("First start, enter apikey here: ");
-    scanf("%s", apikey);
-    FILE *f = fopen(fname, "w+");
-    fprintf(f, apikey);
+    fgets(apikey, sizeof(apikey), stdin);
+    FILE *f = fopen(fname, "w");
+      fprintf(f, apikey);
     fclose(f);
   }
   else{
     FILE *f = fopen(fname, "r");
-    fgets(apikey, sizeof(apikey), f);
+      fgets(apikey, sizeof(apikey), f);
     fclose(f);
   }
 
+  printf("%s\n", apikey);
 
-  printf("%s", apikey);
   return 0;
 }
