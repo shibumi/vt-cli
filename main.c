@@ -41,6 +41,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <jansson.h>
+#include <pwd.h>
 
 #include <VtResponse.h>
 #include <VtDomain.h>
@@ -52,6 +53,7 @@
 #include <VtComments.h>
 
 static bool no_error = true; // Developer did this, interrupts eveything when signals are received
+char *fname = NULL;
 
 void print_usage(const char *program_name){
   printf("%s\n", program_name);
@@ -69,6 +71,19 @@ void sighand_callback(int sig){
   no_error = false;
 }
 
+/* Return the user's home directory.  We use $HOME, and if that fails,
+ * we fall back on the home directory of the effective user ID. */
+void get_homedir(void){
+  fname = getenv("HOME"); // Try get $HOME
+  if (fname == NULL) {
+    const struct passwd *pw = getpwuid(geteuid()); // if it failed, try get home from passwd
+    if (pw != NULL){
+      fname = pw->pw_dir;
+    } // if
+  } // if
+  fname = strcat(fname, "/.vtconfig"); // add path for config to $HOME
+}
+
 // Returns 1 (True) if file doesn't exists or isn't readable, else 0
 int filecheck(const char *fname){
   FILE *f;
@@ -80,15 +95,16 @@ int filecheck(const char *fname){
 }
 
 int main(int argc, char * const *argv){
-  char apikey[65]; //the apikey need a way to prevent buffer overflows?
-  const char *fname = strcat(getenv("HOME"),"/.vtconfig"); //location of config file TODO Check if HOME exists
-  int c;
   struct VtResponse *response;
   struct VtDomain *domain_report;
   struct VtIpAddr *ip_report;
   struct VtUrl *url_report;
   struct VtFile *file_scan;
   struct VtComments *comments;
+  char apikey[65]; //the apikey need a way to prevent buffer overflows?
+  int c;
+
+  get_homedir();
 
   // Check if vtconfig exists
   if(filecheck(fname)){
@@ -98,12 +114,20 @@ int main(int argc, char * const *argv){
     // fgets puts his own nullterminator, so the char array is 65 bytes long, so the first 64 bytes are filled with the apikey
     fgets(apikey, sizeof(apikey), stdin);
     FILE *f = fopen(fname, "w"); // Write apikey to config for next start
-      fprintf(f, apikey);
+    if(f == NULL){
+      printf("Fehler beim Öffnen der Datei. Überprüfen sie, ob sie Schreibrechte in %s haben.\n", fname);
+      return 0;
+    } // if
+    fprintf(f, apikey);
     fclose(f);
   } // if
   else{
     FILE *f = fopen(fname, "r"); // Read out key if file already exists
-      fgets(apikey, sizeof(apikey), f);
+    if(f == NULL){
+      printf("Fehler beim Öffnen der Datei. Überprüfen sie, ob sie Schreibrechte für %s haben.\n", fname);
+      return 0;
+    } // if
+    fgets(apikey, sizeof(apikey), f);
     fclose(f);
   } // else
 
@@ -116,9 +140,6 @@ int main(int argc, char * const *argv){
   //signals for c-vtapi dunno why
   signal(SIGHUP, sighand_callback);
   signal(SIGTERM, sighand_callback);
-
-  // Here comes the Wrapper!
-  // Don't know, ideas how to parse the options and do callbacks on the functions?
 
   while(1){
     int option_index = 0;
