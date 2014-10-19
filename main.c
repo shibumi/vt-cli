@@ -93,9 +93,10 @@ int main(int argc, char * const *argv){
   else{
     FILE *f = fopen(fname, "r");
       fgets(apikey, sizeof(apikey), f);
-      printf(apikey);
     fclose(f);
   }
+
+  printf(apikey);
 
   // Print Usage if no parameter is given
   if(argc < 2){
