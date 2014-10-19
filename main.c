@@ -30,8 +30,6 @@
  * vim: set ts=2 sts=2 sw=2 et
  */
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -87,8 +85,8 @@ int main(int argc, char * const *argv){
   struct VtResponse *response;
   struct VtDomain *domain_report;
   struct VtIpAddr *ip_report;
-  struct VtFile *file_scan;
   struct VtUrl *url_report;
+  struct VtFile *file_scan;
   struct VtComments *comments;
 
   // Check if vtconfig exists
@@ -120,6 +118,8 @@ int main(int argc, char * const *argv){
   signal(SIGHUP, sighand_callback);
   signal(SIGTERM, sighand_callback);
 
+  // Here comes the Wrapper!
+  // Don't know, ideas how to parse the options and do callbacks on the functions?
 
   return 0;
 }
