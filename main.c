@@ -51,6 +51,7 @@
 #include <VtUrlDist.h>
 #include <VtFile.h>
 #include <VtComments.h>
+#define APIKEY_SIZE 65
 
 static bool no_error = true; // Developer did this, interrupts eveything when signals are received
 char *fname = NULL;
@@ -84,56 +85,71 @@ void get_homedir(void){
   fname = strcat(fname, "/.vtconfig"); // add path for config to $HOME
 }
 
-// Returns 1 (True) if file doesn't exists or isn't readable, else 0
+// Returns 1 (True) if file  exists , else 0 when doesn't exist or not readable
 int filecheck(char *fname){
   FILE *f;
   if (f = fopen(fname, "r")){
     fclose(f);
-    return 0;
+    return 1;
   } // if
-  return 1;
+  return 0;
 }
 
+int getapikey(char* apikey){
+  // Check if vtconfig exists
+  if(!filecheck(fname)){
+    printf("No vtconfig found!\n");
+    printf("First start? Enter apikey here: ");
+
+    // fgets puts his own nullterminator, so the char array is 65 bytes long, so the first 64 bytes are filled with the apikey
+    fgets(apikey, APIKEY_SIZE, stdin);
+    FILE *f = fopen(fname, "w"); // Write apikey to config for next start
+    if(f == NULL){
+      printf("Fehler beim Öffnen der Datei. Überprüfen sie, ob sie Schreibrechte in %s haben.\n", fname); //why not english here?
+      return 0;
+    } // if
+
+    fprintf(f, apikey);
+    fclose(f);
+
+  } // if
+  else{
+    FILE *f = fopen(fname, "r"); // Read out key if file already exists
+    if(f == NULL){
+      printf("Fehler beim Öffnen der Datei. Überprüfen sie, ob sie Schreibrechte für %s haben.\n", fname); //why not english here?
+      return 0;
+    } // if
+
+    fgets(apikey, APIKEY_SIZE, f);
+    fclose(f);
+  } // else
+} // getapikey
+
+int free_variables(char* apikey){
+  free(apikey);
+  apikey = NULL;
+  return 0;
+} // free_variables
+
+
 int main(int argc, char * const *argv){
+  //VirusTotal-Structs
   struct VtResponse *response;
   struct VtDomain *domain_report;
   struct VtIpAddr *ip_report;
   struct VtUrl *url_report;
   struct VtFile *file_scan;
   struct VtComments *comments;
-  char apikey[65]; //the apikey need a way to prevent buffer overflows?
-  int c;
 
-  get_homedir();
-
-  // Check if vtconfig exists
-  if(filecheck(fname)){
-    printf("No vtconfig found!\n");
-    printf("First start? Enter apikey here: ");
-
-    // fgets puts his own nullterminator, so the char array is 65 bytes long, so the first 64 bytes are filled with the apikey
-    fgets(apikey, sizeof(apikey), stdin);
-    FILE *f = fopen(fname, "w"); // Write apikey to config for next start
-    if(f == NULL){
-      printf("Fehler beim Öffnen der Datei. Überprüfen sie, ob sie Schreibrechte in %s haben.\n", fname);
-      return 0;
-    } // if
-    fprintf(f, apikey);
-    fclose(f);
-  } // if
-  else{
-    FILE *f = fopen(fname, "r"); // Read out key if file already exists
-    if(f == NULL){
-      printf("Fehler beim Öffnen der Datei. Überprüfen sie, ob sie Schreibrechte für %s haben.\n", fname);
-      return 0;
-    } // if
-    fgets(apikey, sizeof(apikey), f);
-    fclose(f);
-  } // else
+  char* apikey = (char*)calloc(APIKEY_SIZE, APIKEY_SIZE*sizeof(char)); // TODO must be free'd
+  int c; //see switch-case 
+  get_homedir(); 
+  getapikey(apikey);
 
   // Print Usage if no parameter is given
   if(argc < 2){
     print_usage(argv[0]); // argv[0] is the programs name
+    free_variables(apikey);
     return 0;
   } // if
 
@@ -194,6 +210,6 @@ int main(int argc, char * const *argv){
     } // while
     printf("\n");
   } // if
-
+  free_variables(apikey);
   return 0;
 } // int main
