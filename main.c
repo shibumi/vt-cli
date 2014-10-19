@@ -34,17 +34,24 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
-#include <getopt.h> // Do we need this? Maybe we can parse options with something else
+#include <getopt.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
 #include <jansson.h>
 
-#include "VtFile.h"
-#include "VtResponse.h" // Developer should fix this!
+#include <VtComments.h>
+#include <VtDomain.h>
+#include <VtFileDist.h>
+#include <VtIpAddr.h>
+#include <VtUrl.h>
+#include <VtUrlDist.h>
+#include <VtFile.h>
+#include <VtResponse.h>
 
 static bool no_error = true; // Developer did this, interrupts eveything when signals are received
 
@@ -77,26 +84,21 @@ int filecheck(const char *fname){
 int main(int argc, char * const *argv){
   char apikey[65]; //the apikey need a way to prevent buffer overflows?
   const char *fname = strcat(getenv("HOME"),"/.vtconfig"); //location of config file TODO Check if HOME exists
-
-  //signals for c-vtapi dunno why
-  signal(SIGHUP, sighand_callback);
-  signal(SIGTERM, sighand_callback);
-
-  // Print Usage if no parameter is given
-  if(argc < 2){
-    print_usage(argv[0]); // argv[0] is the programs name
-    return 0;
-  }
+  struct VtResponse *response;
+  struct VtDomain *domain_report;
+  struct VtIpAddr *ip_report;
+  struct VtFile *file_scan;
+  struct VtUrl *url_report;
+  struct VtComments *comments;
 
   // Check if vtconfig exists
   if(filecheck(fname)){
     printf("No vtconfig found!\n");
-    printf("First start, enter apikey here: ");
+    printf("First start? Enter apikey here: ");
 
     // fgets puts his own nullterminator, so the char array is 65 bytes long, so the first 64 bytes are filled with the apikey
     fgets(apikey, sizeof(apikey), stdin);
-
-    FILE *f = fopen(fname, "w"); // Write key to file for next start
+    FILE *f = fopen(fname, "w"); // Write apikey to config for next start
       fprintf(f, apikey);
     fclose(f);
   }
@@ -107,6 +109,17 @@ int main(int argc, char * const *argv){
   }
 
   printf("%s\n", apikey);
+
+  // Print Usage if no parameter is given
+  if(argc < 2){
+    print_usage(argv[0]); // argv[0] is the programs name
+    return 0;
+  }
+
+  //signals for c-vtapi dunno why
+  signal(SIGHUP, sighand_callback);
+  signal(SIGTERM, sighand_callback);
+
 
   return 0;
 }
