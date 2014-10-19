@@ -47,17 +47,6 @@
 
 static bool no_error = true;
 
-/*
-comments       . --resource HASH --get FLAG --put COMMENT --before YYYYMMDDHHSS
-domain_report  . --report DOMAIN
-file_dist      . --reports WHATEVER --before TIMESTAMP --after TIMESTAMP --limit RATE --repeat TIMES --sleep SECONDS
-ip_report      . --report IP
-scan           . --filescan FILE --report HASH --cluster YYYY-MM-DD --download HASH --out FILE
-search         . --query STRING --offset VALUE
-url            . --all-info FLAG --report-scan FLAG --scan URL --report URL
-url_dist       . --all-info FLAG --before TIMESTAMP --after TIMESTAMP --limit RATE --repeat TIMES --sleep SECONDS
-*/
-
 void print_usage(const char *program_name){
   printf("%s", program_name);
   printf("    scandomain <DOMAIN>        get a report on DOMAIN\n");
@@ -67,21 +56,21 @@ void print_usage(const char *program_name){
   printf("    commentsget <HASH> <before>        before is a timestamp with YYYYMMDDHHSS, optional\n");
   printf("    commentsput <HASH> 'comments'        add comment to resource by hash\n");
   printf("    search <STRING> <offset>        search for a report\n");
-  printf("    filedist <HASH> <before/after> <TIMESTAMP> <limit> <repeat> <sleep>        filedist for hash, before/after is required\n");
-  printf("    urldist <allinfo> <before/after> <TIMESTAMP> <limit> <repeat> <sleep>        urldist for timestamp, before/after is required, allinfo is boolean\n");
 }
 
-int filecheck(const char *fname)
-{
-    FILE *f;
-    if (f = fopen(fname, "r"))
-    {
-        fclose(f);
-        return 0;
-    }
-    return 1;
+void sighand_callback(int sig){
+  printf("signal caught %d\n", sig);
+  no_error = false;
 }
 
+int filecheck(const char *fname){
+  FILE *f;
+  if (f = fopen(fname, "r")){
+    fclose(f);
+    return 0;
+  }
+  return 1;
+}
 
 int main(int argc, char * const *argv){
   char apikey[64];
@@ -92,6 +81,9 @@ int main(int argc, char * const *argv){
     return 0;
   }
   // Check if vt-config exists
+
+  signal(SIGHUP, sighand_callback);
+  signal(SIGTERM, sighand_callback);
 
   const char *fname = strcat(getenv("HOME"),"/.vtconfig");
   if(filecheck(fname)){
