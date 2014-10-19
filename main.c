@@ -73,19 +73,21 @@ int filecheck(const char *fname){
 }
 
 int main(int argc, char * const *argv){
+  //the apikey need a way to prevent buffer overflows?
   char apikey[64];
+  //location of config file TODO Check if HOME exists
+  const char *fname = strcat(getenv("HOME"),"/.vtconfig");
+  //signals for c-vtapi dunno why
+  signal(SIGHUP, sighand_callback);
+  signal(SIGTERM, sighand_callback);
 
   // Print Usage if no parameter is given
   if(argc < 2){
     print_usage(argv[0]);
     return 0;
   }
+  
   // Check if vt-config exists
-
-  signal(SIGHUP, sighand_callback);
-  signal(SIGTERM, sighand_callback);
-
-  const char *fname = strcat(getenv("HOME"),"/.vtconfig");
   if(filecheck(fname)){
     printf("No vtconfig found!\n");
     printf("First start, enter apikey here: ");
