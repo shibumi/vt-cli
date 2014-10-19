@@ -117,6 +117,7 @@ int getapikey(char* apikey){
     FILE *f = fopen(fname, "r"); // Read out key if file already exists
     if(f == NULL){
       printf("Fehler beim Öffnen der Datei. Überprüfen sie, ob sie Schreibrechte für %s haben.\n", fname); //why not english here?
+      // CUZ KOPIER PASTE!!!!!!
       return 0;
     } // if
 
