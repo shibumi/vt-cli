@@ -36,16 +36,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <getopt.h>
+#include <getopt.h> // Do we need this? Maybe we can parse options with something else
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
 #include <jansson.h>
-#include "VtFile.h"
-#include "VtResponse.h"
 
-static bool no_error = true;
+#include "VtFile.h"
+#include "VtResponse.h" // Developer should fix this!
+
+static bool no_error = true; // Developer did this, interrupts eveything when signals are received
 
 void print_usage(const char *program_name){
   printf("%s\n", program_name);
@@ -63,6 +64,8 @@ void sighand_callback(int sig){
   no_error = false;
 }
 
+
+// Returns 1 (True) if file doesn't exists or isn't readable, else 0
 int filecheck(const char *fname){
   FILE *f;
   if (f = fopen(fname, "r")){
@@ -82,7 +85,7 @@ int main(int argc, char * const *argv){
 
   // Print Usage if no parameter is given
   if(argc < 2){
-    print_usage(argv[0]);
+    print_usage(argv[0]); // argv[0] is the programs name
     return 0;
   }
 
@@ -90,13 +93,16 @@ int main(int argc, char * const *argv){
   if(filecheck(fname)){
     printf("No vtconfig found!\n");
     printf("First start, enter apikey here: ");
+
+    // fgets puts his own nullterminator, so the char array is 65 bytes long, so the first 64 bytes are filled with the apikey
     fgets(apikey, sizeof(apikey), stdin);
-    FILE *f = fopen(fname, "w");
+
+    FILE *f = fopen(fname, "w"); // Write key to file for next start
       fprintf(f, apikey);
     fclose(f);
   }
   else{
-    FILE *f = fopen(fname, "r");
+    FILE *f = fopen(fname, "r"); // Read out key if file already exists
       fgets(apikey, sizeof(apikey), f);
     fclose(f);
   }
