@@ -85,7 +85,7 @@ void get_homedir(void){
 }
 
 // Returns 1 (True) if file doesn't exists or isn't readable, else 0
-int filecheck(const char *fname){
+int filecheck(char *fname){
   FILE *f;
   if (f = fopen(fname, "r")){
     fclose(f);
