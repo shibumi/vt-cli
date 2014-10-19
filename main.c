@@ -64,7 +64,6 @@ void sighand_callback(int sig){
   no_error = false;
 }
 
-
 // Returns 1 (True) if file doesn't exists or isn't readable, else 0
 int filecheck(const char *fname){
   FILE *f;
