@@ -71,28 +71,44 @@ void print_usage(const char *program_name){
   printf("    urldist <allinfo> <before/after> <TIMESTAMP> <limit> <repeat> <sleep>        urldist for timestamp, before/after is required, allinfo is boolean\n");
 }
 
-int main(int argc, char * const *argv){
-  char* api_key = NULL;
-  char buffer[64];
+int filecheck(const char *fname)
+{
+    FILE *f;
+    if (f = fopen(fname, "r"))
+    {
+        fclose(f);
+        return 0;
+    }
+    return 1;
+}
 
-  // Get apikey from ~/.vt-cli
-  FILE *f = fopen(strcat(getenv("HOME"),"/.vt-cli"), "w+");
-  if(f == NULL){
-    printf("Error opening file.\n");
-    exit(1);
-  }
-  api_key = fgets(buffer, sizeof(buffer), f);
-  if(api_key == NULL){
-    printf("First start, enter apikey here:\n");
-    scanf("%s", api_key);
-  }
-  printf("%s", api_key);
-  fclose(f);
+
+int main(int argc, char * const *argv){
+  char apikey[64];
 
   // Print Usage if no parameter is given
   if(argc < 2){
     print_usage(argv[0]);
     return 0;
   }
+  // Check if vt-config exists
 
+  const char *fname = strcat(getenv("HOME"),"/.vtconfig");
+  if(filecheck(fname)){
+    printf("No vtconfig found!\n");
+    printf("First start, enter apikey here: ");
+    scanf("%s", apikey);
+    FILE *f = fopen(fname, "w+");
+    fprintf(f, apikey);
+    fclose(f);
+  }
+  else{
+    FILE *f = fopen(fname, "r");
+    fgets(apikey, sizeof(apikey), f);
+    fclose(f);
+  }
+
+
+  printf("%s", apikey);
+  return 0;
 }
