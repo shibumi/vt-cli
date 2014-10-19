@@ -73,7 +73,9 @@ int filecheck(const char *fname){
 }
 
 int main(int argc, char * const *argv){
-  char apikey[64];
+  char *apikey = NULL;
+  char buffer[64];
+  const char *fname = strcat(getenv("HOME"),"/.vtconfig");
 
   // Print Usage if no parameter is given
   if(argc < 2){
@@ -81,23 +83,24 @@ int main(int argc, char * const *argv){
     return 0;
   }
 
+  // Creator of the vtapi did this, lol wtf
   signal(SIGHUP, sighand_callback);
   signal(SIGTERM, sighand_callback);
 
-  const char *fname = strcat(getenv("HOME"),"/.vtconfig");
+  // Check if vtconfig exists, if not ask for api key and save it to file
   if(filecheck(fname)){
     printf("No vtconfig found!\n");
     printf("First start, enter apikey here: ");
-    scanf("%s", apikey);
-    FILE *f = fopen(fname, "w+");
-    //TODO Apikey in file speichern
-  }
-  else{
-    //TODO apikey lesen
-    FILE *f = fopen(fname, "r");
-    fgets(apikey, sizeof(apikey), f);
+    scanf("%s", buffer);
+    FILE *f = fopen(fname, "w");
+    fprintf(f, "%s", buffer);
+    fclose(f);
   }
 
-  printf("%s\n", apikey);
+  // Read out the key, no problems here because above you saved one
+  FILE *f = fopen(fname, "r");
+  apikey = fgets(buffer, sizeof(buffer), f);
+  printf(apikey);
+  fclose(f);
 
 }
