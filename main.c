@@ -90,17 +90,17 @@ int main(int argc, char * const *argv){
       fprintf(f, "%s", apikey);
     fclose(f);
   }
+  else{
+    FILE *f = fopen(fname, "r");
+      fgets(apikey, sizeof(apikey), f);
+      printf(apikey);
+    fclose(f);
+  }
 
   // Print Usage if no parameter is given
   if(argc < 2){
     print_usage(argv[0]);
     return 0;
   }
-
-  // Read out the key, no problems here because above you saved one
-  FILE *f = fopen(fname, "r");
-    fgets(apikey, sizeof(apikey), f);
-    printf(apikey);
-  fclose(f);
 
 }
