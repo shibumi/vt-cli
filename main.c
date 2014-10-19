@@ -42,14 +42,14 @@
 #include <errno.h>
 #include <jansson.h>
 
-#include <VtComments.h>
+#include <VtResponse.h>
 #include <VtDomain.h>
-#include <VtFileDist.h>
 #include <VtIpAddr.h>
 #include <VtUrl.h>
+#include <VtFileDist.h>
 #include <VtUrlDist.h>
 #include <VtFile.h>
-#include <VtResponse.h>
+#include <VtComments.h>
 
 static bool no_error = true; // Developer did this, interrupts eveything when signals are received
 
