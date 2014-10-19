@@ -75,13 +75,14 @@ int filecheck(const char *fname){
   if (f = fopen(fname, "r")){
     fclose(f);
     return 0;
-  }
+  } // if
   return 1;
 }
 
 int main(int argc, char * const *argv){
   char apikey[65]; //the apikey need a way to prevent buffer overflows?
   const char *fname = strcat(getenv("HOME"),"/.vtconfig"); //location of config file TODO Check if HOME exists
+  int c;
   struct VtResponse *response;
   struct VtDomain *domain_report;
   struct VtIpAddr *ip_report;
@@ -99,20 +100,18 @@ int main(int argc, char * const *argv){
     FILE *f = fopen(fname, "w"); // Write apikey to config for next start
       fprintf(f, apikey);
     fclose(f);
-  }
+  } // if
   else{
     FILE *f = fopen(fname, "r"); // Read out key if file already exists
       fgets(apikey, sizeof(apikey), f);
     fclose(f);
-  }
-
-  printf("%s\n", apikey);
+  } // else
 
   // Print Usage if no parameter is given
   if(argc < 2){
     print_usage(argv[0]); // argv[0] is the programs name
     return 0;
-  }
+  } // if
 
   //signals for c-vtapi dunno why
   signal(SIGHUP, sighand_callback);
@@ -121,5 +120,59 @@ int main(int argc, char * const *argv){
   // Here comes the Wrapper!
   // Don't know, ideas how to parse the options and do callbacks on the functions?
 
+  while(1){
+    int option_index = 0;
+    static struct option long_options[] = {
+      {"scandomain",  required_argument, 0, 'd'},
+      {"scanip",      required_argument, 0, 'i'},
+      {"scanfile",    required_argument, 0, 'f'},
+      {"scanurl",     required_argument, 0, 'u'},
+      {"commentsget", required_argument, 0, 'g'},
+      {"commentsput", required_argument, 0, 'p'},
+      {"search",      required_argument, 0, 's'},
+      {0,             0,                 0,  0 }
+    }; // static struct option
+
+    c = getopt_long_only(argc, argv, "", long_options, &option_index);
+
+    if(c == -1){
+      break;
+    } // if
+
+    switch(c){
+      case 'd':
+        // scandomain wrapper
+        break; // case d - scandomain
+      case 'i':
+        // scanip  wrapper
+        break; // case i - scanip
+      case 'f':
+        // scanfile wrapper
+        break; // case f - scanfile
+      case 'u':
+        // scanurl wrapper
+        break; // case u - scanurl
+      case 'g':
+        // commentsget wrapper
+        break; // case g - commentsget
+      case 'p':
+        // commentsput wrapper
+        break; // case p - commentsput
+      case 's':
+        // search function
+        break; // case s - search
+      default:
+        printf("?? getopt returned character code 0%o ??\n", c);
+    } // switch
+  } // While
+
+  if (optind < argc) {
+    printf("non-option ARGV-elements: ");
+    while (optind < argc){
+      printf("%s ", argv[optind++]);
+    } // while
+    printf("\n");
+  } // if
+
   return 0;
-}
+} // int main
