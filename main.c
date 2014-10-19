@@ -74,7 +74,7 @@ int filecheck(const char *fname){
 
 int main(int argc, char * const *argv){
   //the apikey need a way to prevent buffer overflows?
-  char apikey[65];
+  char apikey[64];
   //location of config file TODO Check if HOME exists
   const char *fname = strcat(getenv("HOME"),"/.vtconfig");
   //signals for c-vtapi dunno why
