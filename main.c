@@ -54,7 +54,6 @@
 #define APIKEY_SIZE 65
 
 static bool no_error = true; // Developer did this, interrupts eveything when signals are received
-char *fname = NULL;
 
 void print_usage(const char *program_name){
   printf("%s\n", program_name);
@@ -74,7 +73,8 @@ void sighand_callback(int sig){
 
 /* Return the user's home directory.  We use $HOME, and if that fails,
  * we fall back on the home directory of the effective user ID. */
-void get_homedir(void){
+char* get_homedir(){
+  static char* fname= NULL;
   fname = getenv("HOME"); // Try get $HOME
   if (fname == NULL) {
     const struct passwd *pw = getpwuid(geteuid()); // if it failed, try get home from passwd
@@ -83,6 +83,7 @@ void get_homedir(void){
     } // if
   } // if
   fname = strcat(fname, "/.vtconfig"); // add path for config to $HOME
+  return fname;
 }
 
 // Returns 1 (True) if file  exists , else 0 when doesn't exist or not readable
@@ -95,7 +96,7 @@ int filecheck(char *fname){
   return 0;
 }
 
-int getapikey(char* apikey){
+int getapikey(char* apikey, char* fname){
   // Check if vtconfig exists
   if(!filecheck(fname)){
     printf("No vtconfig found!\n");
@@ -143,8 +144,9 @@ int main(int argc, char * const *argv){
 
   char* apikey = (char*)calloc(APIKEY_SIZE, APIKEY_SIZE*sizeof(char)); // TODO must be free'd
   int c; //see switch-case 
-  get_homedir(); 
-  getapikey(apikey);
+  char* fname = NULL;
+  fname = get_homedir(); 
+  getapikey(apikey, fname);
 
   // Print Usage if no parameter is given
   if(argc < 2){
