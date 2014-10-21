@@ -104,6 +104,17 @@ int getapikey(char* apikey, char* fname){
 
     // fgets puts his own nullterminator, so the char array is 65 bytes long, so the first 64 bytes are filled with the apikey
     fgets(apikey, APIKEY_SIZE, stdin);
+    
+    // checking if the API-key is valid
+    int i;
+    for(i = 0; i < 65; i++){
+      if(!isxdigit(apikey[i])){
+        printf("Error, the API-Key is not valid!\n");
+        printf("The API-Key must contain hexdigits\n");
+        return 0;
+        }
+    }
+
     FILE *f = fopen(fname, "w"); // Write apikey to config for next start
     if(f == NULL){
       printf("Fehler beim Öffnen der Datei. Überprüfen sie, ob sie Schreibrechte in %s haben.\n", fname); //why not english here?
@@ -123,6 +134,7 @@ int getapikey(char* apikey, char* fname){
 
     fgets(apikey, APIKEY_SIZE, f);
     fclose(f);
+    return 1;
   } // else
 } // getapikey
 
@@ -146,7 +158,7 @@ int main(int argc, char * const *argv){
   int c; //see switch-case 
   char* fname = NULL;
   fname = get_homedir(); 
-  getapikey(apikey, fname);
+  if(!getapikey(apikey, fname)) return 1;
 
   // Print Usage if no parameter is given
   if(argc < 2){
