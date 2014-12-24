@@ -2,8 +2,6 @@
  *
  * Copyright (c) 2014 by Christian Rebischke <echo Q2hyaXMuUmViaXNjaGtlQGdtYWlsLmNvbQo= | base64 -d>
  *
- * Copyright (c) 2014 by Klassiker <echo a2xhc3Npa2Vya2xhc3Npa2VyQGxpdmUuZGUK | base64 -d>
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -18,10 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/
  *
  *======================================================================
- * Author: Klassiker
- * Email : echo a2xhc3Npa2Vya2xhc3Npa2VyQGxpdmUuZGUK | base64 -d
- * Github: www.github.com/Klassiker
- *
  * Author: Christian Rebischke
  * Email : echo Q2hyaXMuUmViaXNjaGtlQGdtYWlsLmNvbQo= | base64 -d
  * Github: www.github.com/Shibumi
@@ -80,8 +74,8 @@ char* get_homedir(){
     const struct passwd *pw = getpwuid(geteuid()); // if it failed, try get home from passwd
     if (pw != NULL){
       fname = pw->pw_dir;
-    } // if
-  } // if
+    } 
+  } 
   fname = strcat(fname, "/.vtconfig"); // add path for config to $HOME
   return fname;
 }
@@ -92,7 +86,7 @@ int filecheck(char *fname){
   if (f = fopen(fname, "r")){
     fclose(f);
     return 1;
-  } // if
+  }
   return 0;
 }
 
@@ -117,32 +111,32 @@ int getapikey(char* apikey, char* fname){
 
     FILE *f = fopen(fname, "w"); // Write apikey to config for next start
     if(f == NULL){
-      printf("Fehler beim Öffnen der Datei. Überprüfen sie, ob sie Schreibrechte in %s haben.\n", fname); //why not english here?
+      printf("Error while opening the %s. Please check the file permissions \n", fname); 
       return 0;
-    } // if
+    } 
 
     fprintf(f, apikey);
     fclose(f);
 
-  } // if
+  } 
   else{
     FILE *f = fopen(fname, "r"); // Read out key if file already exists
     if(f == NULL){
-      printf("Fehler beim Öffnen der Datei. Überprüfen sie, ob sie Schreibrechte für %s haben.\n", fname); //why not english here?
+      printf("Error while opening the %s. Please check the file permissions \n", fname); 
       return 0;
-    } // if
+    }
 
     fgets(apikey, APIKEY_SIZE, f);
     fclose(f);
     return 1;
-  } // else
-} // getapikey
+  } 
+} 
 
 int free_variables(char* apikey){
   free(apikey);
   apikey = NULL;
   return 0;
-} // free_variables
+} 
 
 
 int main(int argc, char * const *argv){
@@ -155,17 +149,17 @@ int main(int argc, char * const *argv){
   struct VtComments *comments;
 
   char* apikey = (char*)calloc(APIKEY_SIZE, APIKEY_SIZE*sizeof(char)); // TODO must be free'd
-  int c; //see switch-case 
+  int c; 
   char* fname = NULL;
   fname = get_homedir(); 
   if(!getapikey(apikey, fname)) return 1;
 
   // Print Usage if no parameter is given
   if(argc < 2){
-    print_usage(argv[0]); // argv[0] is the programs name
+    print_usage(argv[0]);
     free_variables(apikey);
     return 0;
-  } // if
+  } 
 
   //signals for c-vtapi dunno why
   signal(SIGHUP, sighand_callback);
@@ -188,42 +182,42 @@ int main(int argc, char * const *argv){
 
     if(c == -1){
       break;
-    } // if
+    } 
 
     switch(c){
       case 'd':
         // scandomain wrapper
-        break; // case d - scandomain
+        break; 
       case 'i':
         // scanip  wrapper
-        break; // case i - scanip
+        break; 
       case 'f':
         // scanfile wrapper
-        break; // case f - scanfile
+        break; 
       case 'u':
         // scanurl wrapper
-        break; // case u - scanurl
+        break; 
       case 'g':
         // commentsget wrapper
-        break; // case g - commentsget
+        break; 
       case 'p':
         // commentsput wrapper
-        break; // case p - commentsput
+        break; 
       case 's':
         // search function
-        break; // case s - search
+        break; 
       default:
         printf("?? getopt returned character code 0%o ??\n", c);
-    } // switch
-  } // While
+    } 
+  } 
 
   if (optind < argc) {
     printf("non-option ARGV-elements: ");
     while (optind < argc){
       printf("%s ", argv[optind++]);
-    } // while
+    } 
     printf("\n");
-  } // if
+  } 
   free_variables(apikey);
   return 0;
-} // int main
+} 
